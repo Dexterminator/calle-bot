@@ -37,15 +37,28 @@ def get_words(tweets):
 	finder = re.compile(r'[\S]+', re.UNICODE)
 	for tweet in tweets:
 		words = finder.findall(tweet)
-		print words
 		all_words.append(words)
 	return all_words
 
-
-
 def generate_test_file_from_tweets():
 	tweets = get_filtered_tweets()
-	print len(tweets)
 	write_test_file(tweets)
 
+def get_file_tweets():
+	with open('test_tweets', 'r') as f:
+		tweets = f.readlines()
+	return tweets
+
+def get_file_wordlists():
+	tweets = get_file_tweets()
+	worldlists = get_words(tweets)
+	return worldlists
+
+def get_twitter_wordlists():
+	tweets = get_filtered_tweets()
+	worldlists = get_words(tweets)
+	return worldlists
+
 if __name__ == '__main__':
+	worldlists = get_file_wordlists()
+	print worldlists
