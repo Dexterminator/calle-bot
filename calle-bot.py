@@ -10,7 +10,7 @@ CONSUMER_SECRET = 'sIzLofT62RNpZEKDcc6cRwZFtkiiyngKzXBgyNxutfE8LIWszm'
 ACCESS_KEY = '2648673991-BJyAcIKs9XJp9CNjDWsnlEYSGpb0Yeno2LHdzss'
 ACCESS_SECRET = 'p4xtAW31nvVtLZ1quvO5pjoR9R09MG3StoZDcfwQagnd2'
 NUMBER_OF_TWEETS = 2000
-TWEET_FILE = 'test_tweets_ab'
+TWEET_FILE = 'test_tweets_obama'
 #setup stuff
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
@@ -118,29 +118,7 @@ def count_tuple_word_length(key):
 		count += len(word)
 	return count
 
-def build_tweet_bi(ngram_dict):
-	tweet_list = []
-	tweet_start = random.choice(ngram_dict.keys())
-	tweet_sentence = list(tweet_start)
-	num_characters = count_tuple_word_length(tweet_start) + 2
-	while num_characters <= 140:
-		key = (tweet_sentence[-2], tweet_sentence[-1])
-		if key in ngram_dict:
-			new_word = random.choice(ngram_dict[key])
-			if (num_characters + len(new_word) + 1) < 140:
-				tweet_sentence.append(new_word)
-				num_characters += len(new_word) + 1
-			else:
-				tweet_list.append(tweet_sentence)
-				break
-		else:
-			tweet_list.append(tweet_sentence)
-			new_start = random.choice(ngram_dict.keys())
-			if (num_characters + count_tuple_word_length(new_start) + 2) < 140:
-				tweet_sentence = list(new_start)
-				num_characters += count_tuple_word_length(new_start) + 2
-			else:
-				break
+def sentence_from_list(tweet_list):
 	tweet = ""
 	for sentence in tweet_list:
 		sentence[0] = sentence[0].capitalize()
@@ -157,7 +135,7 @@ def build_tweet_smooth(bigram_dict, trigram_dict):
 	num_characters = count_tuple_word_length(tweet_start) + 2
 	while num_characters <= 140:
 		key = (tweet_sentence[-3], tweet_sentence[-2], tweet_sentence[-1])
-		if key in ngram_dict:
+		if key in trigram_dict:
 			new_word = random.choice(trigram_dict[key])
 			if (num_characters + len(new_word) + 1) < 140:
 				tweet_sentence.append(new_word)
@@ -167,7 +145,7 @@ def build_tweet_smooth(bigram_dict, trigram_dict):
 				break
 		else:
 			new_key = (tweet_sentence[-2], tweet_sentence[-1])
-			if new_key in ngram_dict:
+			if new_key in bigram_dict:
 				new_word = random.choice(bigram_dict[new_key])
 				if (num_characters + len(new_word) + 1) < 140:
 					tweet_sentence.append(new_word)
@@ -192,13 +170,14 @@ def build_tweet_smooth(bigram_dict, trigram_dict):
 		tweet += ". "
 	return tweet
 
-def build_tweet_tri(ngram_dict):
+def build_tweet(ngram_dict):
 	tweet_list = []
 	tweet_start = random.choice(ngram_dict.keys())
 	tweet_sentence = list(tweet_start)
 	num_characters = count_tuple_word_length(tweet_start) + 2
+	n = len(tweet_start)
 	while num_characters <= 140:
-		key = (tweet_sentence[-3], tweet_sentence[-2], tweet_sentence[-1])
+		key = tuple(tweet_sentence[-n:])
 		if key in ngram_dict:
 			new_word = random.choice(ngram_dict[key])
 			if (num_characters + len(new_word) + 1) < 140:
@@ -215,36 +194,33 @@ def build_tweet_tri(ngram_dict):
 				num_characters += count_tuple_word_length(new_start) + 2
 			else:
 				break
-	tweet = ""
-	for sentence in tweet_list:
-		sentence[0] = sentence[0].capitalize()
-		while sentence[-1] in ['and', 'to', 'of', 'for', 'from', 'the', 'with', 'on', 'a']:
-			sentence = sentence[:-1]
-		tweet += " ".join(sentence)
-		tweet += ". "
-	return tweet
+	return sentence_from_list(tweet_list)
 
-if __name__ == '__main__':
-	generate_test_file_from_tweets()
-	ngram_func = get_bigrams # Choose which type of ngram to use
+
+def main():
+	# generate_test_file_from_tweets()
 	wordlists = get_file_wordlists()
 	mod_wordlists = modify_statuses(wordlists)
-	ngram_lists = []
-	for wordlist in mod_wordlists:
-		ngram_lists.append(ngram_func(wordlist))
-	ngram_lists = remove_ngrams_with_dots(ngram_lists)
-	ngram_lists = remove_special_characters_from_ngrams(ngram_lists)
-	ngram_dict = get_ngram_dict(ngram_lists)
 
-	# FOR TRIGRAMS:
+	# Bigrams
+	bigram_lists = []
+	for wordlist in mod_wordlists:
+		bigram_lists.append(get_bigrams(wordlist))
+	bigram_lists = remove_ngrams_with_dots(bigram_lists)
+	bigram_lists = remove_special_characters_from_ngrams(bigram_lists)
+	bigram_dict = get_ngram_dict(bigram_lists)
+
+	# Trigrams
 	trigram_lists = []
 	for wordlist in mod_wordlists:
 		trigram_lists.append(get_trigrams(wordlist))
 	trigram_lists = remove_ngrams_with_dots(trigram_lists)
 	trigram_lists = remove_special_characters_from_ngrams(trigram_lists)
 	trigram_dict = get_ngram_dict(trigram_lists)
-	#for key, value in ngram_dict.iteritems():
-	#	print key, value
-	print build_tweet_bi(ngram_dict)
-	print build_tweet_tri(trigram_dict)
-	print build_tweet_smooth(ngram_dict, trigram_dict)
+
+	print build_tweet(bigram_dict)
+	print build_tweet(trigram_dict)
+	print build_tweet_smooth(bigram_dict, trigram_dict)
+
+if __name__ == '__main__':
+	main()
