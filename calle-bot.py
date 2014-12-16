@@ -112,10 +112,8 @@ def get_ngram_dict(ngram_lists):
 	for ngram_list in ngram_lists:
 		for ngram in ngram_list:
 			key = ngram[0]
-			if not key in ngram_dict:
-				ngram_dict[key] = []
 			value = ngram[1]
-			ngram_dict[key].append(value)
+			ngram_dict.setdefault(key, []).append(value)
 	return ngram_dict
 
 if __name__ == '__main__':
