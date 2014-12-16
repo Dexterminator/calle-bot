@@ -10,8 +10,7 @@ CONSUMER_SECRET = 'sIzLofT62RNpZEKDcc6cRwZFtkiiyngKzXBgyNxutfE8LIWszm'
 ACCESS_KEY = '2648673991-BJyAcIKs9XJp9CNjDWsnlEYSGpb0Yeno2LHdzss'
 ACCESS_SECRET = 'p4xtAW31nvVtLZ1quvO5pjoR9R09MG3StoZDcfwQagnd2'
 NUMBER_OF_TWEETS = 2000
-TWEET_FILE = 'test_tweets_2'
-fake_tweets = ["I don't even know", "Dark lord cthulhu", "I love moderaterna, they are awesome", "http://wat.com", "lol, why are we doing this"]
+TWEET_FILE = 'test_tweets_ab'
 #setup stuff
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
@@ -25,7 +24,7 @@ def write_test_file(tweets):
 
 def get_filtered_tweets():
 	tweets = []
-	for update in Cursor(api.user_timeline, id='carlbildt').items():
+	for update in Cursor(api.user_timeline, id='aftonbladet').items():
 		if len(tweets) == NUMBER_OF_TWEETS:
 			break
 		tweet = update.text
@@ -226,6 +225,7 @@ def build_tweet_tri(ngram_dict):
 	return tweet
 
 if __name__ == '__main__':
+	generate_test_file_from_tweets()
 	ngram_func = get_bigrams # Choose which type of ngram to use
 	wordlists = get_file_wordlists()
 	mod_wordlists = modify_statuses(wordlists)
