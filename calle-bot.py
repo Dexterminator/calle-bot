@@ -128,6 +128,32 @@ def sentence_from_list(tweet_list):
 		tweet += ". "
 	return tweet
 
+def build_tweet(ngram_dict):
+	tweet_list = []
+	tweet_start = random.choice(ngram_dict.keys())
+	tweet_sentence = list(tweet_start)
+	num_characters = count_tuple_word_length(tweet_start) + 2
+	n = len(tweet_start)
+	while num_characters <= 140:
+		key = tuple(tweet_sentence[-n:])
+		if key in ngram_dict:
+			new_word = random.choice(ngram_dict[key])
+			if (num_characters + len(new_word) + 1) < 140:
+				tweet_sentence.append(new_word)
+				num_characters += len(new_word) + 1
+			else:
+				tweet_list.append(tweet_sentence)
+				break
+		else:
+			tweet_list.append(tweet_sentence)
+			new_start = random.choice(ngram_dict.keys())
+			if (num_characters + count_tuple_word_length(new_start) + 2) < 140:
+				tweet_sentence = list(new_start)
+				num_characters += count_tuple_word_length(new_start) + 2
+			else:
+				break
+	return sentence_from_list(tweet_list)
+
 def build_tweet_smooth(bigram_dict, trigram_dict):
 	tweet_list = []
 	tweet_start = random.choice(trigram_dict.keys())
@@ -161,41 +187,7 @@ def build_tweet_smooth(bigram_dict, trigram_dict):
 					num_characters += count_tuple_word_length(new_start) + 2
 				else:
 					break
-	tweet = ""
-	for sentence in tweet_list:
-		sentence[0] = sentence[0].capitalize()
-		while sentence[-1] in ['and', 'to', 'of', 'for', 'from', 'the', 'with', 'on', 'a']:
-			sentence = sentence[:-1]
-		tweet += " ".join(sentence)
-		tweet += ". "
-	return tweet
-
-def build_tweet(ngram_dict):
-	tweet_list = []
-	tweet_start = random.choice(ngram_dict.keys())
-	tweet_sentence = list(tweet_start)
-	num_characters = count_tuple_word_length(tweet_start) + 2
-	n = len(tweet_start)
-	while num_characters <= 140:
-		key = tuple(tweet_sentence[-n:])
-		if key in ngram_dict:
-			new_word = random.choice(ngram_dict[key])
-			if (num_characters + len(new_word) + 1) < 140:
-				tweet_sentence.append(new_word)
-				num_characters += len(new_word) + 1
-			else:
-				tweet_list.append(tweet_sentence)
-				break
-		else:
-			tweet_list.append(tweet_sentence)
-			new_start = random.choice(ngram_dict.keys())
-			if (num_characters + count_tuple_word_length(new_start) + 2) < 140:
-				tweet_sentence = list(new_start)
-				num_characters += count_tuple_word_length(new_start) + 2
-			else:
-				break
 	return sentence_from_list(tweet_list)
-
 
 def main():
 	# generate_test_file_from_tweets()
