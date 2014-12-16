@@ -107,21 +107,26 @@ def remove_special_characters_from_ngrams(ngram_lists):
 		new_ngram_lists.append(new_ngram_list)
 	return new_ngram_lists
 
-
-
+def get_ngram_dict(ngram_lists):
+	ngram_dict = {}
+	for ngram_list in ngram_lists:
+		for ngram in ngram_list:
+			key = ngram[0]
+			if not key in ngram_dict:
+				ngram_dict[key] = []
+			value = ngram[1]
+			ngram_dict[key].append(value)
+	return ngram_dict
 
 if __name__ == '__main__':
-	tweets = get_file_tweets()
-	print tweets
-	print len(tweets)
+	ngram_func = get_bigrams # Choose which type of ngram to use
 	wordlists = get_file_wordlists()
 	mod_wordlists = modify_statuses(wordlists)
-	print mod_wordlists[0]
-	print wordlists[0]
-	bigram_lists = []
+	ngram_lists = []
 	for wordlist in mod_wordlists:
-		bigram_lists.append(get_bigrams(wordlist))
-	new_bigram_lists = remove_ngrams_with_dots(bigram_lists)
-	newer_bigram_lists = remove_special_characters_from_ngrams(new_bigram_lists)
-	for bigram_list in newer_bigram_lists:
-		print bigram_list
+		ngram_lists.append(ngram_func(wordlist))
+	ngram_lists = remove_ngrams_with_dots(ngram_lists)
+	ngram_lists = remove_special_characters_from_ngrams(ngram_lists)
+	ngram_dict = get_ngram_dict(ngram_lists)
+	for key in ngram_dict:
+		print key, ngram_dict[key]
