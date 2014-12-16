@@ -10,6 +10,7 @@ CONSUMER_SECRET = 'sIzLofT62RNpZEKDcc6cRwZFtkiiyngKzXBgyNxutfE8LIWszm'
 ACCESS_KEY = '2648673991-BJyAcIKs9XJp9CNjDWsnlEYSGpb0Yeno2LHdzss'
 ACCESS_SECRET = 'p4xtAW31nvVtLZ1quvO5pjoR9R09MG3StoZDcfwQagnd2'
 NUMBER_OF_TWEETS = 2000
+TWEET_FILE = 'test_tweets_2'
 fake_tweets = ["I don't even know", "Dark lord cthulhu", "I love moderaterna, they are awesome", "http://wat.com", "lol, why are we doing this"]
 #setup stuff
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
@@ -17,7 +18,7 @@ auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 api = tweepy.API(auth)
 
 def write_test_file(tweets):
-	with open('test_tweets_2', 'w') as f:
+	with open(TWEET_FILE, 'w') as f:
 		for tweet in tweets:
 			f.write(tweet.strip('\n').encode('utf8'))
 			f.write('\n')
@@ -46,7 +47,7 @@ def generate_test_file_from_tweets():
 	write_test_file(tweets)
 
 def get_file_tweets():
-	with open('test_tweets_2', 'r') as f:
+	with open(TWEET_FILE, 'r') as f:
 		tweets = f.readlines()
 	return tweets
 
@@ -60,11 +61,11 @@ def get_twitter_wordlists():
 	wordlists = get_words(tweets)
 	return wordlists
 
-def get_bigrams(wordlists):
-	return zip(zip(wordlists, wordlists[1:]), wordlists[2:])
+def get_bigrams(wordlist):
+	return zip(zip(wordlist, wordlist[1:]), wordlist[2:])
 
-def get_trigrams(wordlists):
-	return zip(zip(wordlists, wordlists[1:], wordlists[2:]), wordlists[3:])
+def get_trigrams(wordlist):
+	return zip(zip(wordlist, wordlist[1:], wordlist[2:]), wordlist[3:])
 
 if __name__ == '__main__':
 	tweets = get_file_tweets()
