@@ -119,7 +119,7 @@ def count_tuple_word_length(key):
 		count += len(word)
 	return count
 
-def build_tweet(ngram_dict):
+def build_tweet_bi(ngram_dict):
 	tweet_list = []
 	tweet_start = random.choice(ngram_dict.keys())
 	tweet_sentence = list(tweet_start)
@@ -141,18 +141,17 @@ def build_tweet(ngram_dict):
 				tweet_sentence = list(new_start)
 				num_characters += count_tuple_word_length(new_start) + 2
 			else:
-				tweet_list.append(tweet_sentence)
 				break
 	tweet = ""
 	for sentence in tweet_list:
 		sentence[0] = sentence[0].capitalize()
-		if sentence[-1] == 'and':
+		while sentence[-1] in ['and', 'to', 'of', 'for', 'from', 'the', 'with', 'on', 'a']:
 			sentence = sentence[:-1]
 		tweet += " ".join(sentence)
 		tweet += ". "
 	return tweet
 
-def build_tweet_smooth(trigram_dict, bigram_dict):
+def build_tweet_smooth(bigram_dict, trigram_dict):
 	tweet_list = []
 	tweet_start = random.choice(trigram_dict.keys())
 	tweet_sentence = list(tweet_start)
@@ -184,17 +183,47 @@ def build_tweet_smooth(trigram_dict, bigram_dict):
 					tweet_sentence = list(new_start)
 					num_characters += count_tuple_word_length(new_start) + 2
 				else:
-					tweet_list.append(tweet_sentence)
 					break
 	tweet = ""
 	for sentence in tweet_list:
 		sentence[0] = sentence[0].capitalize()
-		if sentence[-1] == 'and':
+		while sentence[-1] in ['and', 'to', 'of', 'for', 'from', 'the', 'with', 'on', 'a']:
 			sentence = sentence[:-1]
 		tweet += " ".join(sentence)
 		tweet += ". "
 	return tweet
 
+def build_tweet_tri(ngram_dict):
+	tweet_list = []
+	tweet_start = random.choice(ngram_dict.keys())
+	tweet_sentence = list(tweet_start)
+	num_characters = count_tuple_word_length(tweet_start) + 2
+	while num_characters <= 140:
+		key = (tweet_sentence[-3], tweet_sentence[-2], tweet_sentence[-1])
+		if key in ngram_dict:
+			new_word = random.choice(ngram_dict[key])
+			if (num_characters + len(new_word) + 1) < 140:
+				tweet_sentence.append(new_word)
+				num_characters += len(new_word) + 1
+			else:
+				tweet_list.append(tweet_sentence)
+				break
+		else:
+			tweet_list.append(tweet_sentence)
+			new_start = random.choice(ngram_dict.keys())
+			if (num_characters + count_tuple_word_length(new_start) + 2) < 140:
+				tweet_sentence = list(new_start)
+				num_characters += count_tuple_word_length(new_start) + 2
+			else:
+				break
+	tweet = ""
+	for sentence in tweet_list:
+		sentence[0] = sentence[0].capitalize()
+		while sentence[-1] in ['and', 'to', 'of', 'for', 'from', 'the', 'with', 'on', 'a']:
+			sentence = sentence[:-1]
+		tweet += " ".join(sentence)
+		tweet += ". "
+	return tweet
 
 if __name__ == '__main__':
 	ngram_func = get_bigrams # Choose which type of ngram to use
@@ -206,6 +235,16 @@ if __name__ == '__main__':
 	ngram_lists = remove_ngrams_with_dots(ngram_lists)
 	ngram_lists = remove_special_characters_from_ngrams(ngram_lists)
 	ngram_dict = get_ngram_dict(ngram_lists)
+
+	# FOR TRIGRAMS:
+	trigram_lists = []
+	for wordlist in mod_wordlists:
+		trigram_lists.append(get_trigrams(wordlist))
+	trigram_lists = remove_ngrams_with_dots(trigram_lists)
+	trigram_lists = remove_special_characters_from_ngrams(trigram_lists)
+	trigram_dict = get_ngram_dict(trigram_lists)
 	#for key, value in ngram_dict.iteritems():
 	#	print key, value
-	print build_tweet(ngram_dict)
+	print build_tweet_bi(ngram_dict)
+	print build_tweet_tri(trigram_dict)
+	print build_tweet_smooth(ngram_dict, trigram_dict)
