@@ -94,6 +94,20 @@ def remove_ngrams_with_dots(ngram_lists):
 		new_ngram_lists.append([ngram for ngram in ngram_list if not contains_special_character(ngram)])
 	return new_ngram_lists
 
+def remove_special_characters_from_ngrams(ngram_lists):
+	comp = re.compile("[\.!?,;:](?!\d,;)", re.UNICODE)
+	new_ngram_lists = []
+	for n_gram_list in ngram_lists:
+		new_ngram_list = []
+		for a, b in n_gram_list:
+			tuple_list = []
+			for word in a:
+				tuple_list.append(comp.sub('', word))
+			new_ngram_list.append((tuple([tuple(tuple_list), comp.sub('', b)])))
+		new_ngram_lists.append(new_ngram_list)
+	return new_ngram_lists
+
+
 
 
 if __name__ == '__main__':
@@ -108,5 +122,6 @@ if __name__ == '__main__':
 	for wordlist in mod_wordlists:
 		bigram_lists.append(get_bigrams(wordlist))
 	new_bigram_lists = remove_ngrams_with_dots(bigram_lists)
-	for bigram_list in new_bigram_lists:
+	newer_bigram_lists = remove_special_characters_from_ngrams(new_bigram_lists)
+	for bigram_list in newer_bigram_lists:
 		print bigram_list
