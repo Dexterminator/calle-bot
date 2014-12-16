@@ -72,7 +72,6 @@ def modify_statuses(wordLists):
 			else:
 				this_list.append(comp.sub('', word))
 		res_list.append(this_list)
-
 	return res_list
 
 def contains_special_character(ngram):
@@ -110,9 +109,7 @@ def remove_special_characters_from_ngrams(ngram_lists):
 def get_ngram_dict(ngram_lists):
 	ngram_dict = {}
 	for ngram_list in ngram_lists:
-		for ngram in ngram_list:
-			key = ngram[0]
-			value = ngram[1]
+		for key, value in ngram_list:
 			ngram_dict.setdefault(key, []).append(value)
 	return ngram_dict
 
