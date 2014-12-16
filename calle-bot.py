@@ -61,19 +61,52 @@ def get_twitter_wordlists():
 	wordlists = get_words(tweets)
 	return wordlists
 
+def modify_statuses(wordLists):
+	comp = re.compile("[\"\']", re.UNICODE)
+	res_list = []
+	for tweet_list in wordLists:
+		this_list = []
+		for word in tweet_list:
+			if word.startswith('http'):
+				this_list.append(word)
+			else:
+				this_list.append(comp.sub('', word))
+		res_list.append(this_list)
+
+	return res_list
+
+def contains_special_character(ngram):
+	comp = re.compile("[\.!?,;:](?!\d,;)", re.UNICODE)
+	for word in ngram[0]:
+		if re.search(comp, word):
+			return True
+	return False
+
 def get_bigrams(wordlist):
 	return zip(zip(wordlist, wordlist[1:]), wordlist[2:])
 
 def get_trigrams(wordlist):
 	return zip(zip(wordlist, wordlist[1:], wordlist[2:]), wordlist[3:])
 
+def remove_ngrams_with_dots(ngram_lists):
+	new_ngram_lists = []
+	for ngram_list in ngram_lists:
+		new_ngram_lists.append([ngram for ngram in ngram_list if not contains_special_character(ngram)])
+	return new_ngram_lists
+
+
+
 if __name__ == '__main__':
 	tweets = get_file_tweets()
 	print tweets
 	print len(tweets)
 	wordlists = get_file_wordlists()
+	mod_wordlists = modify_statuses(wordlists)
+	print mod_wordlists[0]
+	print wordlists[0]
 	bigram_lists = []
-	for wordlist in wordlists:
+	for wordlist in mod_wordlists:
 		bigram_lists.append(get_bigrams(wordlist))
-	for bigram_list in bigram_lists:
+	new_bigram_lists = remove_ngrams_with_dots(bigram_lists)
+	for bigram_list in new_bigram_lists:
 		print bigram_list
