@@ -113,6 +113,46 @@ def get_ngram_dict(ngram_lists):
 			ngram_dict.setdefault(key, []).append(value)
 	return ngram_dict
 
+def count_tuple_word_length(key):
+	count = 0
+	for word in key:
+		count += len(word)
+	return count
+
+def build_tweet(ngram_dict):
+	tweet_list = []
+	tweet_start = random.choice(ngram_dict.keys())
+	tweet_sentence = list(tweet_start)
+	num_characters = count_tuple_word_length(tweet_start) + 2
+	while num_characters <= 140:
+		key = (tweet_sentence[-2], tweet_sentence[-1])
+		if key in ngram_dict:
+			new_word = random.choice(ngram_dict[key])
+			if (num_characters + len(new_word) + 1) < 140:
+				tweet_sentence.append(new_word)
+				num_characters += len(new_word) + 1
+			else:
+				tweet_list.append(tweet_sentence)
+				break
+		else:
+			tweet_list.append(tweet_sentence)
+			new_start = random.choice(ngram_dict.keys())
+			if (num_characters + count_tuple_word_length(new_start) + 2) < 140:
+				tweet_sentence = list(new_start)
+				num_characters += count_tuple_word_length(new_start) + 2
+			else:
+				tweet_list.append(tweet_sentence)
+				break
+	tweet = ""
+	for sentence in tweet_list:
+		sentence[0] = sentence[0].capitalize()
+		if sentence[-1] == 'and':
+			sentence = sentence[:-1]
+		tweet += " ".join(sentence)
+		tweet += ". "
+	return tweet
+
+
 if __name__ == '__main__':
 	ngram_func = get_bigrams # Choose which type of ngram to use
 	wordlists = get_file_wordlists()
@@ -123,5 +163,6 @@ if __name__ == '__main__':
 	ngram_lists = remove_ngrams_with_dots(ngram_lists)
 	ngram_lists = remove_special_characters_from_ngrams(ngram_lists)
 	ngram_dict = get_ngram_dict(ngram_lists)
-	for key in ngram_dict:
-		print key, ngram_dict[key]
+	#for key, value in ngram_dict.iteritems():
+	#	print key, value
+	print build_tweet(ngram_dict)
