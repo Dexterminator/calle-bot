@@ -71,5 +71,8 @@ if __name__ == '__main__':
 	print tweets
 	print len(tweets)
 	wordlists = get_file_wordlists()
-	bigrams = get_bigrams(wordlists[0])
-	print bigrams
+	bigram_lists = []
+	for wordlist in wordlists:
+		bigram_lists.append(get_bigrams(wordlist))
+	for bigram_list in bigram_lists:
+		print bigram_list
