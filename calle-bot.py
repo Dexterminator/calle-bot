@@ -10,7 +10,8 @@ CONSUMER_SECRET = 'sIzLofT62RNpZEKDcc6cRwZFtkiiyngKzXBgyNxutfE8LIWszm'
 ACCESS_KEY = '2648673991-BJyAcIKs9XJp9CNjDWsnlEYSGpb0Yeno2LHdzss'
 ACCESS_SECRET = 'p4xtAW31nvVtLZ1quvO5pjoR9R09MG3StoZDcfwQagnd2'
 NUMBER_OF_TWEETS = 1000
-TWEET_FILE = 'test_tweets_2'
+TWEET_FILE = 'tweets_bildt'
+USER_ID = 'carlbildt'
 #setup stuff
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
@@ -24,7 +25,7 @@ def write_test_file(tweets):
 
 def get_filtered_tweets():
 	tweets = []
-	for update in Cursor(api.user_timeline, id='ladydahmer').items():
+	for update in Cursor(api.user_timeline, id=USER_ID).items():
 		if len(tweets) == NUMBER_OF_TWEETS:
 			break
 		tweet = update.text
